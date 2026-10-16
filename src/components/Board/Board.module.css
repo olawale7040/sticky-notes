@@ -1,0 +1,10 @@
+.board {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  background-color: var(--color-board);
+  background-image: radial-gradient(var(--color-board-grid) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+  user-select: none;
+  touch-action: none;
+}
