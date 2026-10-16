@@ -3,6 +3,7 @@ import type { Point, Size } from '../../domain/geometry'
 
 export interface BoardApi {
   getBounds(): Size
+  toBoardPoint(client: Point): Point
   isOverTrash(client: Point): boolean
   setTrashActive(active: boolean): void
 }

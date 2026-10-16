@@ -5,6 +5,18 @@
   background-color: var(--color-board);
   background-image: radial-gradient(var(--color-board-grid) 1.5px, transparent 1.5px);
   background-size: 24px 24px;
+  cursor: crosshair;
   user-select: none;
   touch-action: none;
+}
+
+.draft {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2147483646;
+  border: 2px dashed var(--color-accent);
+  border-radius: var(--radius);
+  background: rgb(59 111 224 / 0.08);
+  pointer-events: none;
 }

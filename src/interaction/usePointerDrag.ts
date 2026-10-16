@@ -8,7 +8,6 @@ export interface DragUpdate {
 }
 
 export interface PointerDragHandlers {
-  onStart?: (origin: Point) => void
   onMove: (update: DragUpdate) => void
   onEnd: (update: DragUpdate) => void
   onCancel?: () => void
@@ -77,7 +76,5 @@ export function usePointerDrag(handlers: PointerDragHandlers) {
     target.addEventListener('lostpointercapture', handleCancel)
     window.addEventListener('keydown', handleKeyDown)
     stopActiveDrag.current = stop
-
-    handlersRef.current.onStart?.(origin)
   }, [])
 }
