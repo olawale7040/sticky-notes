@@ -2,6 +2,7 @@ import { memo } from 'react'
 import { useNotesDispatch } from '../../app/notesContext'
 import type { Note as NoteModel } from '../../domain/note'
 import { cx } from '../../utils/cx'
+import { ColorPicker } from './ColorPicker'
 import styles from './Note.module.css'
 import { useNoteGestures } from './useNoteGestures'
 
@@ -25,7 +26,16 @@ export const Note = memo(function Note({ note }: NoteProps) {
       }}
       onPointerDown={() => dispatch({ type: 'note/broughtToFront', id: note.id })}
     >
-      <header className={styles.header} onPointerDown={startMove} title="Drag to move" />
+      <header
+        className={styles.header}
+        onPointerDown={(e) => e.target === e.currentTarget && startMove(e)}
+        title="Drag to move"
+      >
+        <ColorPicker
+          value={note.color}
+          onChange={(color) => dispatch({ type: 'note/colorChanged', id: note.id, color })}
+        />
+      </header>
       <textarea
         className={styles.text}
         value={note.text}

@@ -37,8 +37,12 @@
 }
 
 .header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   flex: none;
   height: 28px;
+  padding: 0 8px;
   border-radius: var(--radius) var(--radius) 0 0;
   background: rgb(0 0 0 / 0.06);
   cursor: grab;
@@ -47,6 +51,16 @@
 
 .dragging .header {
   cursor: grabbing;
+}
+
+.header > * {
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.note:hover .header > *,
+.note:focus-within .header > * {
+  opacity: 1;
 }
 
 .text {
