@@ -11,7 +11,7 @@ interface NoteProps {
 
 export const Note = memo(function Note({ note }: NoteProps) {
   const dispatch = useNotesDispatch()
-  const { rect, isDragging, isOverTrash, startMove } = useNoteGestures(note)
+  const { rect, isDragging, isOverTrash, startMove, startResize } = useNoteGestures(note)
 
   return (
     <article
@@ -33,6 +33,7 @@ export const Note = memo(function Note({ note }: NoteProps) {
         aria-label="Note text"
         onChange={(e) => dispatch({ type: 'note/textChanged', id: note.id, text: e.target.value })}
       />
+      <div className={styles.resizeHandle} onPointerDown={startResize} title="Drag to resize" />
     </article>
   )
 })

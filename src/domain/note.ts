@@ -1,4 +1,4 @@
-import type { Rect, Size } from './geometry'
+import { clampPosition, clampSize, type Rect, type Size } from './geometry'
 
 export type NoteId = string & { readonly __brand: 'NoteId' }
 
@@ -15,6 +15,9 @@ export interface Note {
 
 export const MIN_NOTE_SIZE: Size = { width: 120, height: 90 }
 export const DEFAULT_NOTE_SIZE: Size = { width: 200, height: 160 }
+
+export const fitNoteRect = (rect: Rect, bounds: Size): Rect =>
+  clampPosition(clampSize(rect, MIN_NOTE_SIZE, bounds), bounds)
 
 export const createNoteId = (): NoteId => crypto.randomUUID() as NoteId
 
