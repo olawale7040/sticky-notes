@@ -1,0 +1,64 @@
+.note {
+  --note-bg: var(--note-yellow);
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--note-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-note);
+  transition:
+    box-shadow 150ms ease,
+    opacity 150ms ease;
+}
+
+.note[data-color='pink'] {
+  --note-bg: var(--note-pink);
+}
+.note[data-color='blue'] {
+  --note-bg: var(--note-blue);
+}
+.note[data-color='green'] {
+  --note-bg: var(--note-green);
+}
+.note[data-color='purple'] {
+  --note-bg: var(--note-purple);
+}
+
+.dragging {
+  box-shadow: var(--shadow-note-active);
+  will-change: transform;
+}
+
+.overTrash {
+  opacity: 0.5;
+}
+
+.header {
+  flex: none;
+  height: 28px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: rgb(0 0 0 / 0.06);
+  cursor: grab;
+  touch-action: none;
+}
+
+.dragging .header {
+  cursor: grabbing;
+}
+
+.text {
+  flex: 1;
+  min-height: 0;
+  padding: 8px 12px 12px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  color: inherit;
+  resize: none;
+  outline: none;
+}
