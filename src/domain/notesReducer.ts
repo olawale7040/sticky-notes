@@ -1,0 +1,83 @@
+import type { Rect } from './geometry'
+import { MIN_NOTE_SIZE, type Note, type NoteColor, type NoteId } from './note'
+
+export interface NotesState {
+  readonly notes: readonly Note[]
+}
+
+export type NotesAction =
+  | { type: 'notes/loaded'; notes: readonly Note[] }
+  | { type: 'note/created'; id: NoteId; rect: Rect; color: NoteColor }
+  | { type: 'note/rectChanged'; id: NoteId; rect: Rect }
+  | { type: 'note/textChanged'; id: NoteId; text: string }
+  | { type: 'note/colorChanged'; id: NoteId; color: NoteColor }
+  | { type: 'note/broughtToFront'; id: NoteId }
+  | { type: 'note/removed'; id: NoteId }
+
+export const initialNotesState: NotesState = { notes: [] }
+
+const topZIndex = (notes: readonly Note[]): number =>
+  notes.reduce((max, note) => Math.max(max, note.zIndex), 0)
+
+const withMinSize = (rect: Rect): Rect => ({
+  ...rect,
+  width: Math.max(rect.width, MIN_NOTE_SIZE.width),
+  height: Math.max(rect.height, MIN_NOTE_SIZE.height),
+})
+
+function updateNote(state: NotesState, id: NoteId, update: (note: Note) => Note): NotesState {
+  let changed = false
+  const notes = state.notes.map((note) => {
+    if (note.id !== id) return note
+    const next = update(note)
+    changed = next !== note
+    return next
+  })
+  return changed ? { notes } : state
+}
+
+export function notesReducer(state: NotesState, action: NotesAction): NotesState {
+  switch (action.type) {
+    case 'notes/loaded':
+      return { notes: action.notes }
+
+    case 'note/created':
+      return {
+        notes: [
+          ...state.notes,
+          {
+            id: action.id,
+            rect: withMinSize(action.rect),
+            text: '',
+            color: action.color,
+            zIndex: topZIndex(state.notes) + 1,
+          },
+        ],
+      }
+
+    case 'note/rectChanged':
+      return updateNote(state, action.id, (note) => ({ ...note, rect: withMinSize(action.rect) }))
+
+    case 'note/textChanged':
+      return updateNote(state, action.id, (note) =>
+        note.text === action.text ? note : { ...note, text: action.text },
+      )
+
+    case 'note/colorChanged':
+      return updateNote(state, action.id, (note) =>
+        note.color === action.color ? note : { ...note, color: action.color },
+      )
+
+    case 'note/broughtToFront': {
+      const top = topZIndex(state.notes)
+      return updateNote(state, action.id, (note) =>
+        note.zIndex === top ? note : { ...note, zIndex: top + 1 },
+      )
+    }
+
+    case 'note/removed': {
+      const notes = state.notes.filter((note) => note.id !== action.id)
+      return notes.length === state.notes.length ? state : { notes }
+    }
+  }
+}
