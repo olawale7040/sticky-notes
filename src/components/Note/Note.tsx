@@ -2,6 +2,7 @@ import { memo } from 'react'
 import { useNotesDispatch } from '../../app/notesContext'
 import type { Note as NoteModel } from '../../domain/note'
 import { cx } from '../../utils/cx'
+import { rectStyle } from '../../utils/rectStyle'
 import { ColorPicker } from './ColorPicker'
 import styles from './Note.module.css'
 import { useNoteGestures } from './useNoteGestures'
@@ -12,18 +13,17 @@ interface NoteProps {
 
 export const Note = memo(function Note({ note }: NoteProps) {
   const dispatch = useNotesDispatch()
-  const { rect, isDragging, isOverTrash, startMove, startResize } = useNoteGestures(note)
+  const { rect, isInteracting, isOverTrash, startMove, startResize } = useNoteGestures(note)
 
   return (
     <article
-      className={cx(styles.note, isDragging && styles.dragging, isOverTrash && styles.overTrash)}
+      className={cx(
+        styles.note,
+        isInteracting && styles.interacting,
+        isOverTrash && styles.overTrash,
+      )}
       data-color={note.color}
-      style={{
-        transform: `translate(${rect.x}px, ${rect.y}px)`,
-        width: rect.width,
-        height: rect.height,
-        zIndex: note.zIndex,
-      }}
+      style={{ ...rectStyle(rect), zIndex: note.zIndex }}
       onPointerDown={() => dispatch({ type: 'note/broughtToFront', id: note.id })}
     >
       <header

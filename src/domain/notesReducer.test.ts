@@ -55,4 +55,28 @@ describe('notesReducer', () => {
     const state = reduce([{ type: 'note/removed', id: id('a') }], withTwoNotes)
     expect(state.notes.map((n) => n.id)).toEqual(['b'])
   })
+
+  it('pulls notes back inside when the board shrinks', () => {
+    const state = reduce(
+      [
+        { type: 'note/rectChanged', id: id('a'), rect: { ...rect, x: 1700, y: 900 } },
+        { type: 'notes/boundsChanged', bounds: { width: 1024, height: 700 } },
+      ],
+      withTwoNotes,
+    )
+    expect(state.notes[0]?.rect).toEqual({ ...rect, x: 1024 - 200, y: 700 - 150 })
+    expect(state.notes[1]).toBe(withTwoNotes.notes[1])
+  })
+
+  it('ignores bounds changes and moves that leave every note in place', () => {
+    expect(
+      notesReducer(withTwoNotes, {
+        type: 'notes/boundsChanged',
+        bounds: { width: 1024, height: 700 },
+      }),
+    ).toBe(withTwoNotes)
+    expect(notesReducer(withTwoNotes, { type: 'note/rectChanged', id: id('a'), rect })).toBe(
+      withTwoNotes,
+    )
+  })
 })

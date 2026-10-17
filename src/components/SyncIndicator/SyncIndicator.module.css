@@ -2,7 +2,7 @@
   position: absolute;
   top: 16px;
   right: 24px;
-  z-index: 2147483647;
+  z-index: var(--z-overlay);
   margin: 0;
   color: var(--color-muted);
   font-size: 12px;

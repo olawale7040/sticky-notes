@@ -1,6 +1,25 @@
-import { clampPosition, clampSize, containsPoint, rectFromPoints } from './geometry'
+import {
+  clampPosition,
+  clampSize,
+  containsPoint,
+  rectFromPoints,
+  resizeRect,
+  translateRect,
+} from './geometry'
 
 const bounds = { width: 1000, height: 800 }
+
+describe('translateRect / resizeRect', () => {
+  const rect = { x: 10, y: 20, width: 100, height: 50 }
+
+  it('moves a rect without changing its size', () => {
+    expect(translateRect(rect, { x: 5, y: -5 })).toEqual({ x: 15, y: 15, width: 100, height: 50 })
+  })
+
+  it('resizes a rect without moving it', () => {
+    expect(resizeRect(rect, { x: 5, y: -5 })).toEqual({ x: 10, y: 20, width: 105, height: 45 })
+  })
+})
 
 describe('rectFromPoints', () => {
   it('normalizes corners dragged in any direction', () => {

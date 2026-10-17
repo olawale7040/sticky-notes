@@ -27,7 +27,7 @@
   --note-bg: var(--note-purple);
 }
 
-.dragging {
+.interacting {
   box-shadow: var(--shadow-note-active);
   will-change: transform;
 }
@@ -49,7 +49,7 @@
   touch-action: none;
 }
 
-.dragging .header {
+.interacting .header {
   cursor: grabbing;
 }
 

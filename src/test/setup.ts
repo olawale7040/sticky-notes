@@ -11,3 +11,9 @@ Element.prototype.hasPointerCapture = function (pointerId: number) {
 Element.prototype.releasePointerCapture = function (pointerId: number) {
   captured.get(this)?.delete(pointerId)
 }
+
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}

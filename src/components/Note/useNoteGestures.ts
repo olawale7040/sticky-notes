@@ -1,21 +1,16 @@
 import { useState } from 'react'
 import { useNotesDispatch } from '../../app/notesContext'
-import { clampPosition, clampSize, type Point, type Rect } from '../../domain/geometry'
+import {
+  clampPosition,
+  clampSize,
+  resizeRect,
+  translateRect,
+  type Point,
+  type Rect,
+} from '../../domain/geometry'
 import { MIN_NOTE_SIZE, type Note } from '../../domain/note'
 import { usePointerDrag } from '../../interaction/usePointerDrag'
 import { useBoard } from '../Board/boardContext'
-
-const translate = (rect: Rect, delta: Point): Rect => ({
-  ...rect,
-  x: rect.x + delta.x,
-  y: rect.y + delta.y,
-})
-
-const grow = (rect: Rect, delta: Point): Rect => ({
-  ...rect,
-  width: rect.width + delta.x,
-  height: rect.height + delta.y,
-})
 
 export function useNoteGestures(note: Note) {
   const dispatch = useNotesDispatch()
@@ -23,9 +18,8 @@ export function useNoteGestures(note: Note) {
   const [preview, setPreview] = useState<Rect | null>(null)
   const [isOverTrash, setIsOverTrash] = useState(false)
 
-  const moved = (delta: Point) => clampPosition(translate(note.rect, delta), board.getBounds())
   const resized = (delta: Point) =>
-    clampSize(grow(note.rect, delta), MIN_NOTE_SIZE, board.getBounds())
+    clampSize(resizeRect(note.rect, delta), MIN_NOTE_SIZE, board.getBounds())
 
   const reset = () => {
     setPreview(null)
@@ -36,7 +30,7 @@ export function useNoteGestures(note: Note) {
   const startMove = usePointerDrag({
     onMove: ({ delta, client }) => {
       const overTrash = board.isOverTrash(client)
-      setPreview(moved(delta))
+      setPreview(translateRect(note.rect, delta))
       setIsOverTrash(overTrash)
       board.setTrashActive(overTrash)
     },
@@ -45,7 +39,8 @@ export function useNoteGestures(note: Note) {
       if (board.isOverTrash(client)) {
         dispatch({ type: 'note/removed', id: note.id })
       } else {
-        dispatch({ type: 'note/rectChanged', id: note.id, rect: moved(delta) })
+        const rect = clampPosition(translateRect(note.rect, delta), board.getBounds())
+        dispatch({ type: 'note/rectChanged', id: note.id, rect })
       }
     },
     onCancel: reset,
@@ -62,7 +57,7 @@ export function useNoteGestures(note: Note) {
 
   return {
     rect: preview ?? note.rect,
-    isDragging: preview !== null,
+    isInteracting: preview !== null,
     isOverTrash,
     startMove,
     startResize,
