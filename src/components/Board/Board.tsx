@@ -11,7 +11,7 @@ import styles from './Board.module.css'
 export function Board() {
   const { notes } = useNotesState()
   const dispatch = useNotesDispatch()
-  const boardRef = useRef<HTMLDivElement>(null)
+  const boardRef = useRef<HTMLElement>(null)
   const trashRef = useRef<HTMLDivElement>(null)
   const [isTrashActive, setTrashActive] = useState(false)
 
@@ -50,13 +50,13 @@ export function Board() {
     [notes],
   )
 
-  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+  const handlePointerDown = (event: PointerEvent<HTMLElement>) => {
     if (event.target !== event.currentTarget) return
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
     startDrawing(event)
   }
 
-  const handleDoubleClick = (event: MouseEvent<HTMLDivElement>) => {
+  const handleDoubleClick = (event: MouseEvent<HTMLElement>) => {
     if (event.target !== event.currentTarget) return
     const center = boardApi.toBoardPoint({ x: event.clientX, y: event.clientY })
     createNote({
@@ -68,9 +68,10 @@ export function Board() {
 
   return (
     <BoardContext value={boardApi}>
-      <div
+      <main
         ref={boardRef}
         className={styles.board}
+        aria-label="Notes board"
         onPointerDown={handlePointerDown}
         onDoubleClick={handleDoubleClick}
       >
@@ -89,7 +90,7 @@ export function Board() {
           />
         )}
         <TrashZone ref={trashRef} isActive={isTrashActive} />
-      </div>
+      </main>
     </BoardContext>
   )
 }
