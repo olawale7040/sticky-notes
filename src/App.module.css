@@ -1,5 +1,11 @@
 .app {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+.message {
+  margin: auto;
+  color: var(--color-muted);
 }

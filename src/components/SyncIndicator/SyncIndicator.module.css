@@ -1,0 +1,14 @@
+.indicator {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  z-index: 2147483647;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.error {
+  color: var(--color-danger);
+}
