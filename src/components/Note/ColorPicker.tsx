@@ -1,4 +1,4 @@
-import { NOTE_COLORS, type NoteColor } from '../../domain/note'
+import { NOTE_COLORS, type NoteColor } from '../../domain/types'
 import styles from './ColorPicker.module.css'
 
 interface ColorPickerProps {

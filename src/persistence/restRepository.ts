@@ -1,7 +1,5 @@
-import type { NotesRepository } from './NotesRepository'
+import type { Fetch, NotesRepository } from './types'
 import { parseNotes } from './parseNotes'
-
-export type Fetch = (url: string, init?: RequestInit) => Promise<Response>
 
 export function createRestRepository(baseUrl: string, fetchFn: Fetch): NotesRepository {
   const url = `${baseUrl}/notes`

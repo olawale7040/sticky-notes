@@ -1,14 +1,8 @@
 import { useState } from 'react'
 import { useNotesDispatch } from '../../app/notesContext'
-import {
-  clampPosition,
-  clampSize,
-  resizeRect,
-  translateRect,
-  type Point,
-  type Rect,
-} from '../../domain/geometry'
-import { MIN_NOTE_SIZE, type Note } from '../../domain/note'
+import { clampPosition, clampSize, resizeRect, translateRect } from '../../domain/geometry'
+import { MIN_NOTE_SIZE } from '../../domain/note'
+import type { Note, Point, Rect } from '../../domain/types'
 import { usePointerDrag } from '../../interaction/usePointerDrag'
 import { useBoard } from '../Board/boardContext'
 

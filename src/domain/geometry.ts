@@ -1,14 +1,4 @@
-export interface Point {
-  readonly x: number
-  readonly y: number
-}
-
-export interface Size {
-  readonly width: number
-  readonly height: number
-}
-
-export interface Rect extends Point, Size {}
+import type { Point, Rect, Size } from './types'
 
 export const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), max)

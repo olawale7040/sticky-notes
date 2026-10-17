@@ -1,4 +1,4 @@
-import type { Fetch } from './restRepository'
+import type { Fetch } from './types'
 
 interface MockFetchOptions {
   latencyMs?: number

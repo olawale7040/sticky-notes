@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { useNotesDispatch } from '../../app/notesContext'
-import type { Note as NoteModel } from '../../domain/note'
+import type { Note as NoteModel } from '../../domain/types'
 import { cx } from '../../utils/cx'
 import { rectStyle } from '../../utils/rectStyle'
 import { ColorPicker } from './ColorPicker'

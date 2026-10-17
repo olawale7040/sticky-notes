@@ -1,17 +1,5 @@
-import { clamp, clampPosition, type Rect, type Size } from './geometry'
-
-export type NoteId = string & { readonly __brand: 'NoteId' }
-
-export const NOTE_COLORS = ['yellow', 'pink', 'blue', 'green', 'purple'] as const
-export type NoteColor = (typeof NOTE_COLORS)[number]
-
-export interface Note {
-  readonly id: NoteId
-  readonly rect: Rect
-  readonly text: string
-  readonly color: NoteColor
-  readonly zIndex: number
-}
+import { clamp, clampPosition } from './geometry'
+import { NOTE_COLORS, type NoteColor, type NoteId, type Rect, type Size } from './types'
 
 export const MIN_NOTE_SIZE: Size = { width: 120, height: 90 }
 export const DEFAULT_NOTE_SIZE: Size = { width: 200, height: 160 }

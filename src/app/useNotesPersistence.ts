@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import type { Note } from '../domain/note'
-import type { NotesRepository } from '../persistence/NotesRepository'
+import type { Note } from '../domain/types'
+import type { NotesRepository } from '../persistence/types'
 import { useNotesDispatch, useNotesState } from './notesContext'
 
 export type SyncStatus = 'loading' | 'loadFailed' | 'saving' | 'saved' | 'saveFailed'

@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { clamp, rectFromPoints, type Point, type Rect } from '../../domain/geometry'
+import { clamp, rectFromPoints } from '../../domain/geometry'
 import { fitNoteRect } from '../../domain/note'
+import type { Point, Rect } from '../../domain/types'
 import { usePointerDrag, type DragUpdate } from '../../interaction/usePointerDrag'
 import type { BoardApi } from './boardContext'
 

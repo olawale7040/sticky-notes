@@ -1,5 +1,6 @@
-import { MIN_NOTE_SIZE, type NoteId } from './note'
-import { initialNotesState, notesReducer, type NotesAction, type NotesState } from './notesReducer'
+import { MIN_NOTE_SIZE } from './note'
+import { initialNotesState, notesReducer } from './notesReducer'
+import type { NoteId, NotesAction, NotesState } from './types'
 
 const id = (value: string) => value as NoteId
 const rect = { x: 0, y: 0, width: 200, height: 150 }

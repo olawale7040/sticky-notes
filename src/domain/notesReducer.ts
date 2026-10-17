@@ -1,19 +1,6 @@
-import { isSameRect, type Rect, type Size } from './geometry'
-import { fitNoteRect, MIN_NOTE_SIZE, type Note, type NoteColor, type NoteId } from './note'
-
-export interface NotesState {
-  readonly notes: readonly Note[]
-}
-
-export type NotesAction =
-  | { type: 'notes/loaded'; notes: readonly Note[] }
-  | { type: 'notes/boundsChanged'; bounds: Size }
-  | { type: 'note/created'; id: NoteId; rect: Rect; color: NoteColor }
-  | { type: 'note/rectChanged'; id: NoteId; rect: Rect }
-  | { type: 'note/textChanged'; id: NoteId; text: string }
-  | { type: 'note/colorChanged'; id: NoteId; color: NoteColor }
-  | { type: 'note/broughtToFront'; id: NoteId }
-  | { type: 'note/removed'; id: NoteId }
+import { isSameRect } from './geometry'
+import { fitNoteRect, MIN_NOTE_SIZE } from './note'
+import type { Note, NoteId, NotesAction, NotesState, Rect } from './types'
 
 export const initialNotesState: NotesState = { notes: [] }
 
