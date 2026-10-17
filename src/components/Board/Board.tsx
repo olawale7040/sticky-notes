@@ -74,6 +74,9 @@ export function Board() {
         onPointerDown={handlePointerDown}
         onDoubleClick={handleDoubleClick}
       >
+        <p className={styles.hint}>
+          Drag on the board to create a note, or double-click for a default one
+        </p>
         {noteElements}
         {draft && (
           <div
