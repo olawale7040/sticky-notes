@@ -35,10 +35,11 @@ export function useNotesPersistence(repository: NotesRepository): SyncStatus {
 
   useEffect(() => {
     latest.current = notes
-    if (persisted.current === null || persisted.current === notes) return
+    const hasLoaded = persisted.current !== null
+    const hasUnsavedChanges = persisted.current !== notes
+    if (!hasLoaded || !hasUnsavedChanges) return
 
-    setStatus('saving')
-    const timer = setTimeout(() => {
+    const saveInOrder = () => {
       saveQueue.current = saveQueue.current
         .then(() => repository.save(notes))
         .then(
@@ -48,8 +49,10 @@ export function useNotesPersistence(repository: NotesRepository): SyncStatus {
           },
           () => setStatus('saveFailed'),
         )
-    }, SAVE_DEBOUNCE_MS)
+    }
 
+    setStatus('saving')
+    const timer = setTimeout(saveInOrder, SAVE_DEBOUNCE_MS)
     return () => clearTimeout(timer)
   }, [notes, repository])
 
