@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useId } from 'react'
 import { useNotesDispatch } from '../../app/notesContext'
 import type { Note as NoteModel } from '../../domain/types'
 import { cx } from '../../utils/cx'
@@ -16,6 +16,7 @@ export const Note = memo(function Note({ note }: NoteProps) {
   const { rect, isInteracting, isOverTrash, startMove, startResize, handleKeyDown } =
     useNoteGestures(note)
   const bringToFront = () => dispatch({ type: 'note/broughtToFront', id: note.id })
+  const instructionsId = useId()
 
   return (
     <article
@@ -35,10 +36,15 @@ export const Note = memo(function Note({ note }: NoteProps) {
           role="button"
           tabIndex={0}
           aria-label="Move note"
-          title="Drag to move. Arrow keys move, Shift+arrows resize, Delete removes."
+          aria-roledescription="draggable"
+          aria-describedby={instructionsId}
+          title="Drag to move"
           onPointerDown={startMove}
           onKeyDown={handleKeyDown}
         />
+        <span id={instructionsId} hidden>
+          Arrow keys move the note, Shift and arrow keys resize it, Delete removes it.
+        </span>
         <ColorPicker
           className={styles.colors}
           value={note.color}

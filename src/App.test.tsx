@@ -78,7 +78,12 @@ describe('Sticky notes app', () => {
 
     await user.dblClick(board)
     await user.tab()
-    expect(screen.getByRole('button', { name: 'Move note' })).toHaveFocus()
+    const grip = screen.getByRole('button', { name: 'Move note' })
+    expect(grip).toHaveFocus()
+    expect(grip).toHaveAttribute('aria-roledescription', 'draggable')
+    expect(grip).toHaveAccessibleDescription(
+      'Arrow keys move the note, Shift and arrow keys resize it, Delete removes it.',
+    )
 
     await user.keyboard('{ArrowRight}{ArrowDown}')
     expect(screen.getByRole('article')).toHaveStyle({ transform: 'translate(10px, 10px)' })
