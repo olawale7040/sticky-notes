@@ -18,6 +18,11 @@ export const resizeRect = (rect: Rect, delta: Point): Rect => ({
   height: rect.height + delta.y,
 })
 
+export const rectCenter = (rect: Rect): Point => ({
+  x: rect.x + rect.width / 2,
+  y: rect.y + rect.height / 2,
+})
+
 export function rectFromPoints(a: Point, b: Point): Rect {
   return {
     x: Math.min(a.x, b.x),

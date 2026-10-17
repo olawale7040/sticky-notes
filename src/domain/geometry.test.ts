@@ -2,6 +2,7 @@ import {
   clampPosition,
   clampSize,
   containsPoint,
+  rectCenter,
   rectFromPoints,
   resizeRect,
   translateRect,
@@ -64,5 +65,11 @@ describe('clampSize', () => {
 
   it('stops growth at the bounds edge', () => {
     expect(clampSize({ x: 800, y: 0, width: 500, height: 100 }, min, bounds).width).toBe(200)
+  })
+})
+
+describe('rectCenter', () => {
+  it('returns the middle of a rect', () => {
+    expect(rectCenter({ x: 10, y: 20, width: 100, height: 50 })).toEqual({ x: 60, y: 45 })
   })
 })
