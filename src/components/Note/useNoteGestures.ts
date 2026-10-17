@@ -33,14 +33,15 @@ export function useNoteGestures(note: Note) {
 
   const startMove = usePointerDrag({
     onMove: ({ delta, client }) => {
-      const overTrash = board.isOverTrash(client)
-      setPreview(translateRect(note.rect, delta))
+      const rect = translateRect(note.rect, delta)
+      const overTrash = board.isOverTrash(client, rect)
+      setPreview(rect)
       setIsOverTrash(overTrash)
       board.setTrashActive(overTrash)
     },
     onEnd: ({ delta, client }) => {
       reset()
-      if (board.isOverTrash(client)) {
+      if (board.isOverTrash(client, translateRect(note.rect, delta))) {
         dispatch({ type: 'note/removed', id: note.id })
       } else {
         dispatch({ type: 'note/rectChanged', id: note.id, rect: moved(delta) })

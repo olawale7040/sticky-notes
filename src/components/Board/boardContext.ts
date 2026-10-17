@@ -1,10 +1,10 @@
 import { createContext, useContext } from 'react'
-import type { Point, Size } from '../../domain/types'
+import type { Point, Rect, Size } from '../../domain/types'
 
 export interface BoardApi {
   getBounds(): Size
   toBoardPoint(client: Point): Point
-  isOverTrash(client: Point): boolean
+  isOverTrash(pointer: Point, noteRect: Rect): boolean
   setTrashActive(active: boolean): void
 }
 

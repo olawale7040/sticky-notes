@@ -25,56 +25,60 @@ export function usePointerDrag(handlers: PointerDragHandlers) {
   return useCallback((event: ReactPointerEvent<HTMLElement>) => {
     if (event.button !== 0 || !event.isPrimary) return
     event.preventDefault()
-
-    const target = event.currentTarget
-    const { pointerId } = event
-    const origin: Point = { x: event.clientX, y: event.clientY }
-    const toUpdate = (e: PointerEvent): DragUpdate => ({
-      delta: { x: e.clientX - origin.x, y: e.clientY - origin.y },
-      client: { x: e.clientX, y: e.clientY },
-    })
-
-    let frame = 0
-    let latest: DragUpdate | null = null
-
-    const handleMove = (e: PointerEvent) => {
-      if (e.pointerId !== pointerId) return
-      latest = toUpdate(e)
-      frame ||= requestAnimationFrame(() => {
-        frame = 0
-        if (latest) handlersRef.current.onMove(latest)
-      })
-    }
-    const handleUp = (e: PointerEvent) => {
-      if (e.pointerId !== pointerId) return
-      stop()
-      handlersRef.current.onEnd(toUpdate(e))
-    }
-    const handleCancel = () => {
-      stop()
-      handlersRef.current.onCancel?.()
-    }
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleCancel()
-    }
-
-    function stop() {
-      cancelAnimationFrame(frame)
-      target.removeEventListener('pointermove', handleMove)
-      target.removeEventListener('pointerup', handleUp)
-      target.removeEventListener('pointercancel', handleCancel)
-      target.removeEventListener('lostpointercapture', handleCancel)
-      window.removeEventListener('keydown', handleKeyDown)
-      if (target.hasPointerCapture(pointerId)) target.releasePointerCapture(pointerId)
-      stopActiveDrag.current = null
-    }
-
-    target.setPointerCapture(pointerId)
-    target.addEventListener('pointermove', handleMove)
-    target.addEventListener('pointerup', handleUp)
-    target.addEventListener('pointercancel', handleCancel)
-    target.addEventListener('lostpointercapture', handleCancel)
-    window.addEventListener('keydown', handleKeyDown)
-    stopActiveDrag.current = stop
+    stopActiveDrag.current = startDrag(event, () => handlersRef.current)
   }, [])
+}
+
+function startDrag(
+  event: ReactPointerEvent<HTMLElement>,
+  getHandlers: () => PointerDragHandlers,
+): () => void {
+  const target: HTMLElement = event.currentTarget
+  const { pointerId } = event
+  const origin: Point = { x: event.clientX, y: event.clientY }
+  const listeners = new AbortController()
+  const options = { signal: listeners.signal }
+  let frame = 0
+
+  const toUpdate = (e: PointerEvent): DragUpdate => ({
+    delta: { x: e.clientX - origin.x, y: e.clientY - origin.y },
+    client: { x: e.clientX, y: e.clientY },
+  })
+
+  const stop = () => {
+    cancelAnimationFrame(frame)
+    listeners.abort()
+    if (target.hasPointerCapture(pointerId)) target.releasePointerCapture(pointerId)
+  }
+
+  const cancel = () => {
+    stop()
+    getHandlers().onCancel?.()
+  }
+
+  target.addEventListener(
+    'pointermove',
+    (e) => {
+      if (e.pointerId !== pointerId) return
+      const update = toUpdate(e)
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => getHandlers().onMove(update))
+    },
+    options,
+  )
+  target.addEventListener(
+    'pointerup',
+    (e) => {
+      if (e.pointerId !== pointerId) return
+      stop()
+      getHandlers().onEnd(toUpdate(e))
+    },
+    options,
+  )
+  target.addEventListener('pointercancel', cancel, options)
+  target.addEventListener('lostpointercapture', cancel, options)
+  window.addEventListener('keydown', (e) => e.key === 'Escape' && cancel(), options)
+  target.setPointerCapture(pointerId)
+
+  return stop
 }

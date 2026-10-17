@@ -17,17 +17,20 @@ export function useNotesPersistence(repository: NotesRepository): SyncStatus {
 
   useEffect(() => {
     let cancelled = false
-    repository.load().then(
-      (loaded) => {
+
+    const load = async () => {
+      try {
+        const loaded = await repository.load()
         if (cancelled) return
         persisted.current = loaded
         dispatch({ type: 'notes/loaded', notes: loaded })
         setStatus('saved')
-      },
-      () => {
+      } catch {
         if (!cancelled) setStatus('loadFailed')
-      },
-    )
+      }
+    }
+
+    load()
     return () => {
       cancelled = true
     }
@@ -35,21 +38,26 @@ export function useNotesPersistence(repository: NotesRepository): SyncStatus {
 
   useEffect(() => {
     latest.current = notes
-    if (persisted.current === null || persisted.current === notes) return
+    const hasLoaded = persisted.current !== null
+    const hasUnsavedChanges = persisted.current !== notes
+    if (!hasLoaded || !hasUnsavedChanges) return
+
+    const save = async () => {
+      try {
+        await repository.save(notes)
+        persisted.current = notes
+        if (latest.current === notes) setStatus('saved')
+      } catch {
+        setStatus('saveFailed')
+      }
+    }
+
+    const queueSave = () => {
+      saveQueue.current = saveQueue.current.then(save)
+    }
 
     setStatus('saving')
-    const timer = setTimeout(() => {
-      saveQueue.current = saveQueue.current
-        .then(() => repository.save(notes))
-        .then(
-          () => {
-            persisted.current = notes
-            if (latest.current === notes) setStatus('saved')
-          },
-          () => setStatus('saveFailed'),
-        )
-    }, SAVE_DEBOUNCE_MS)
-
+    const timer = setTimeout(queueSave, SAVE_DEBOUNCE_MS)
     return () => clearTimeout(timer)
   }, [notes, repository])
 
