@@ -3,6 +3,7 @@ import { NOTE_COLORS, type NoteColor, type NoteId, type Rect, type Size } from '
 
 export const MIN_NOTE_SIZE: Size = { width: 120, height: 90 }
 export const DEFAULT_NOTE_SIZE: Size = { width: 200, height: 160 }
+export const DEFAULT_NOTE_COLOR: NoteColor = 'yellow'
 
 export function fitNoteRect(rect: Rect, bounds: Size): Rect {
   const fitAxis = (size: number, min: number, max: number) => clamp(size, min, Math.max(min, max))
