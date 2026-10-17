@@ -36,30 +36,40 @@
   opacity: 0.5;
 }
 
+.note:has(:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 .header {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   flex: none;
   height: 28px;
-  padding: 0 8px;
+  padding-right: 8px;
   border-radius: var(--radius) var(--radius) 0 0;
   background: rgb(0 0 0 / 0.06);
-  cursor: grab;
-  touch-action: none;
 }
 
-.interacting .header {
+.grip {
+  flex: 1;
+  align-self: stretch;
+  cursor: grab;
+  touch-action: none;
+  outline: none;
+}
+
+.interacting .grip {
   cursor: grabbing;
 }
 
-.header > * {
+.colors {
   opacity: 0;
   transition: opacity 150ms ease;
 }
 
-.note:hover .header > *,
-.note:focus-within .header > * {
+.note:hover .colors,
+.note:focus-within .colors {
   opacity: 1;
 }
 

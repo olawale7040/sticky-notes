@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type KeyboardEvent } from 'react'
 import { useNotesDispatch } from '../../app/notesContext'
 import { clampPosition, clampSize, resizeRect, translateRect } from '../../domain/geometry'
 import { MIN_NOTE_SIZE } from '../../domain/note'
@@ -6,12 +6,22 @@ import type { Note, Point, Rect } from '../../domain/types'
 import { usePointerDrag } from '../../interaction/usePointerDrag'
 import { useBoard } from '../Board/boardContext'
 
+const KEYBOARD_STEP = 10
+
+const ARROW_DIRECTIONS: Record<string, Point> = {
+  ArrowUp: { x: 0, y: -1 },
+  ArrowDown: { x: 0, y: 1 },
+  ArrowLeft: { x: -1, y: 0 },
+  ArrowRight: { x: 1, y: 0 },
+}
+
 export function useNoteGestures(note: Note) {
   const dispatch = useNotesDispatch()
   const board = useBoard()
   const [preview, setPreview] = useState<Rect | null>(null)
   const [isOverTrash, setIsOverTrash] = useState(false)
 
+  const moved = (delta: Point) => clampPosition(translateRect(note.rect, delta), board.getBounds())
   const resized = (delta: Point) =>
     clampSize(resizeRect(note.rect, delta), MIN_NOTE_SIZE, board.getBounds())
 
@@ -33,8 +43,7 @@ export function useNoteGestures(note: Note) {
       if (board.isOverTrash(client)) {
         dispatch({ type: 'note/removed', id: note.id })
       } else {
-        const rect = clampPosition(translateRect(note.rect, delta), board.getBounds())
-        dispatch({ type: 'note/rectChanged', id: note.id, rect })
+        dispatch({ type: 'note/rectChanged', id: note.id, rect: moved(delta) })
       }
     },
     onCancel: reset,
@@ -49,11 +58,26 @@ export function useNoteGestures(note: Note) {
     onCancel: reset,
   })
 
+  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key === 'Delete' || event.key === 'Backspace') {
+      event.preventDefault()
+      dispatch({ type: 'note/removed', id: note.id })
+      return
+    }
+    const direction = ARROW_DIRECTIONS[event.key]
+    if (!direction) return
+    event.preventDefault()
+    const delta = { x: direction.x * KEYBOARD_STEP, y: direction.y * KEYBOARD_STEP }
+    const rect = event.shiftKey ? resized(delta) : moved(delta)
+    dispatch({ type: 'note/rectChanged', id: note.id, rect })
+  }
+
   return {
     rect: preview ?? note.rect,
     isInteracting: preview !== null,
     isOverTrash,
     startMove,
     startResize,
+    handleKeyDown,
   }
 }

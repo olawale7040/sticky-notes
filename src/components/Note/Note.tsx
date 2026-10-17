@@ -13,7 +13,9 @@ interface NoteProps {
 
 export const Note = memo(function Note({ note }: NoteProps) {
   const dispatch = useNotesDispatch()
-  const { rect, isInteracting, isOverTrash, startMove, startResize } = useNoteGestures(note)
+  const { rect, isInteracting, isOverTrash, startMove, startResize, handleKeyDown } =
+    useNoteGestures(note)
+  const bringToFront = () => dispatch({ type: 'note/broughtToFront', id: note.id })
 
   return (
     <article
@@ -24,14 +26,21 @@ export const Note = memo(function Note({ note }: NoteProps) {
       )}
       data-color={note.color}
       style={{ ...rectStyle(rect), zIndex: note.zIndex }}
-      onPointerDown={() => dispatch({ type: 'note/broughtToFront', id: note.id })}
+      onPointerDown={bringToFront}
+      onFocus={bringToFront}
     >
-      <header
-        className={styles.header}
-        onPointerDown={(e) => e.target === e.currentTarget && startMove(e)}
-        title="Drag to move"
-      >
+      <header className={styles.header}>
+        <div
+          className={styles.grip}
+          role="button"
+          tabIndex={0}
+          aria-label="Move note"
+          title="Drag to move. Arrow keys move, Shift+arrows resize, Delete removes."
+          onPointerDown={startMove}
+          onKeyDown={handleKeyDown}
+        />
         <ColorPicker
+          className={styles.colors}
           value={note.color}
           onChange={(color) => dispatch({ type: 'note/colorChanged', id: note.id, color })}
         />

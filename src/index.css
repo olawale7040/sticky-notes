@@ -46,3 +46,11 @@ body {
   overflow: hidden;
   background: var(--color-board);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
+}
