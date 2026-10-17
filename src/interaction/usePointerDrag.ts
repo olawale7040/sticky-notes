@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react'
 import type { PointerEvent as ReactPointerEvent } from 'react'
-import type { Point } from '../domain/geometry'
+import type { Point } from '../domain/types'
 
 export interface DragUpdate {
   readonly delta: Point

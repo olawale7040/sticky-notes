@@ -1,14 +1,16 @@
-import { NOTE_COLORS, type NoteColor } from '../../domain/note'
+import { NOTE_COLORS, type NoteColor } from '../../domain/types'
+import { cx } from '../../utils/cx'
 import styles from './ColorPicker.module.css'
 
 interface ColorPickerProps {
+  className?: string | undefined
   value: NoteColor
   onChange: (color: NoteColor) => void
 }
 
-export function ColorPicker({ value, onChange }: ColorPickerProps) {
+export function ColorPicker({ className, value, onChange }: ColorPickerProps) {
   return (
-    <div className={styles.picker} role="group" aria-label="Note color">
+    <div className={cx(styles.picker, className)} role="group" aria-label="Note color">
       {NOTE_COLORS.map((color) => (
         <button
           key={color}

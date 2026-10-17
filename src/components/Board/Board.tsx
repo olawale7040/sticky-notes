@@ -1,7 +1,9 @@
-import { useMemo, useRef, useState, type MouseEvent, type PointerEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type MouseEvent, type PointerEvent } from 'react'
 import { useNotesDispatch, useNotesState } from '../../app/notesContext'
-import { containsPoint, type Rect } from '../../domain/geometry'
+import { containsPoint } from '../../domain/geometry'
 import { createNoteId, DEFAULT_NOTE_SIZE, fitNoteRect } from '../../domain/note'
+import type { Rect } from '../../domain/types'
+import { rectStyle } from '../../utils/rectStyle'
 import { Note } from '../Note/Note'
 import { TrashZone } from '../TrashZone/TrashZone'
 import { BoardContext, type BoardApi } from './boardContext'
@@ -33,6 +35,17 @@ export function Board() {
     }),
     [],
   )
+
+  useEffect(() => {
+    const board = boardRef.current
+    if (!board) return
+    const observer = new ResizeObserver(() => {
+      const bounds = boardApi.getBounds()
+      if (bounds.width > 0 && bounds.height > 0) dispatch({ type: 'notes/boundsChanged', bounds })
+    })
+    observer.observe(board)
+    return () => observer.disconnect()
+  }, [boardApi, dispatch])
 
   const createNote = (rect: Rect) => {
     dispatch({
@@ -79,16 +92,7 @@ export function Board() {
           Drag on the board to create a note, or double-click for a default one
         </p>
         {noteElements}
-        {draft && (
-          <div
-            className={styles.draft}
-            style={{
-              transform: `translate(${draft.x}px, ${draft.y}px)`,
-              width: draft.width,
-              height: draft.height,
-            }}
-          />
-        )}
+        {draft && <div className={styles.draft} style={rectStyle(draft)} />}
         <TrashZone ref={trashRef} isActive={isTrashActive} />
       </main>
     </BoardContext>

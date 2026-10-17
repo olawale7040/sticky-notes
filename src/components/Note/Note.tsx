@@ -1,7 +1,8 @@
 import { memo } from 'react'
 import { useNotesDispatch } from '../../app/notesContext'
-import type { Note as NoteModel } from '../../domain/note'
+import type { Note as NoteModel } from '../../domain/types'
 import { cx } from '../../utils/cx'
+import { rectStyle } from '../../utils/rectStyle'
 import { ColorPicker } from './ColorPicker'
 import styles from './Note.module.css'
 import { useNoteGestures } from './useNoteGestures'
@@ -12,26 +13,34 @@ interface NoteProps {
 
 export const Note = memo(function Note({ note }: NoteProps) {
   const dispatch = useNotesDispatch()
-  const { rect, isDragging, isOverTrash, startMove, startResize } = useNoteGestures(note)
+  const { rect, isInteracting, isOverTrash, startMove, startResize, handleKeyDown } =
+    useNoteGestures(note)
+  const bringToFront = () => dispatch({ type: 'note/broughtToFront', id: note.id })
 
   return (
     <article
-      className={cx(styles.note, isDragging && styles.dragging, isOverTrash && styles.overTrash)}
+      className={cx(
+        styles.note,
+        isInteracting && styles.interacting,
+        isOverTrash && styles.overTrash,
+      )}
       data-color={note.color}
-      style={{
-        transform: `translate(${rect.x}px, ${rect.y}px)`,
-        width: rect.width,
-        height: rect.height,
-        zIndex: note.zIndex,
-      }}
-      onPointerDown={() => dispatch({ type: 'note/broughtToFront', id: note.id })}
+      style={{ ...rectStyle(rect), zIndex: note.zIndex }}
+      onPointerDown={bringToFront}
+      onFocus={bringToFront}
     >
-      <header
-        className={styles.header}
-        onPointerDown={(e) => e.target === e.currentTarget && startMove(e)}
-        title="Drag to move"
-      >
+      <header className={styles.header}>
+        <div
+          className={styles.grip}
+          role="button"
+          tabIndex={0}
+          aria-label="Move note"
+          title="Drag to move. Arrow keys move, Shift+arrows resize, Delete removes."
+          onPointerDown={startMove}
+          onKeyDown={handleKeyDown}
+        />
         <ColorPicker
+          className={styles.colors}
           value={note.color}
           onChange={(color) => dispatch({ type: 'note/colorChanged', id: note.id, color })}
         />

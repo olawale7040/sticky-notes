@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { act, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { App } from './App'
 
@@ -70,5 +70,34 @@ describe('Sticky notes app', () => {
 
     await user.click(within(first!).getByRole('textbox', { name: 'Note text' }))
     expect(zIndex(first)).toBeGreaterThan(zIndex(second))
+  })
+
+  it('moves and resizes a focused note with the keyboard', async () => {
+    const user = userEvent.setup()
+    const { board } = await renderApp()
+
+    await user.dblClick(board)
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Move note' })).toHaveFocus()
+
+    await user.keyboard('{ArrowRight}{ArrowDown}')
+    expect(screen.getByRole('article')).toHaveStyle({ transform: 'translate(10px, 10px)' })
+
+    await user.keyboard('{Shift>}{ArrowRight}{/Shift}')
+    expect(screen.getByRole('article')).toHaveStyle({ width: '210px' })
+  })
+
+  it('deletes a focused note with Delete, while Backspace in the text only edits text', async () => {
+    const user = userEvent.setup()
+    const { board } = await renderApp()
+
+    await user.dblClick(board)
+    const text = screen.getByRole('textbox', { name: 'Note text' })
+    await user.type(text, 'hi{Backspace}')
+    expect(text).toHaveValue('h')
+
+    act(() => screen.getByRole('button', { name: 'Move note' }).focus())
+    await user.keyboard('{Delete}')
+    expect(screen.queryByRole('article')).not.toBeInTheDocument()
   })
 })

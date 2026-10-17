@@ -24,7 +24,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 2147483646;
+  z-index: var(--z-draft);
   border: 2px dashed var(--color-accent);
   border-radius: var(--radius);
   background: rgb(59 111 224 / 0.08);

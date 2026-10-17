@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import type { Point, Size } from '../../domain/geometry'
+import type { Point, Size } from '../../domain/types'
 
 export interface BoardApi {
   getBounds(): Size

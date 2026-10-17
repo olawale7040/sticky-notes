@@ -1,18 +1,6 @@
-import type { Rect } from './geometry'
-import { MIN_NOTE_SIZE, type Note, type NoteColor, type NoteId } from './note'
-
-export interface NotesState {
-  readonly notes: readonly Note[]
-}
-
-export type NotesAction =
-  | { type: 'notes/loaded'; notes: readonly Note[] }
-  | { type: 'note/created'; id: NoteId; rect: Rect; color: NoteColor }
-  | { type: 'note/rectChanged'; id: NoteId; rect: Rect }
-  | { type: 'note/textChanged'; id: NoteId; text: string }
-  | { type: 'note/colorChanged'; id: NoteId; color: NoteColor }
-  | { type: 'note/broughtToFront'; id: NoteId }
-  | { type: 'note/removed'; id: NoteId }
+import { isSameRect } from './geometry'
+import { fitNoteRect, MIN_NOTE_SIZE } from './note'
+import type { Note, NoteId, NotesAction, NotesState, Rect } from './types'
 
 export const initialNotesState: NotesState = { notes: [] }
 
@@ -25,21 +13,29 @@ const withMinSize = (rect: Rect): Rect => ({
   height: Math.max(rect.height, MIN_NOTE_SIZE.height),
 })
 
-function updateNote(state: NotesState, id: NoteId, update: (note: Note) => Note): NotesState {
+function mapNotes(state: NotesState, update: (note: Note) => Note): NotesState {
   let changed = false
   const notes = state.notes.map((note) => {
-    if (note.id !== id) return note
     const next = update(note)
-    changed = next !== note
+    if (next !== note) changed = true
     return next
   })
   return changed ? { notes } : state
 }
 
+const updateNote = (state: NotesState, id: NoteId, update: (note: Note) => Note): NotesState =>
+  mapNotes(state, (note) => (note.id === id ? update(note) : note))
+
+const withRect = (note: Note, rect: Rect): Note =>
+  isSameRect(note.rect, rect) ? note : { ...note, rect }
+
 export function notesReducer(state: NotesState, action: NotesAction): NotesState {
   switch (action.type) {
     case 'notes/loaded':
       return { notes: action.notes }
+
+    case 'notes/boundsChanged':
+      return mapNotes(state, (note) => withRect(note, fitNoteRect(note.rect, action.bounds)))
 
     case 'note/created':
       return {
@@ -56,7 +52,7 @@ export function notesReducer(state: NotesState, action: NotesAction): NotesState
       }
 
     case 'note/rectChanged':
-      return updateNote(state, action.id, (note) => ({ ...note, rect: withMinSize(action.rect) }))
+      return updateNote(state, action.id, (note) => withRect(note, withMinSize(action.rect)))
 
     case 'note/textChanged':
       return updateNote(state, action.id, (note) =>

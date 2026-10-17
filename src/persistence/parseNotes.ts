@@ -1,5 +1,5 @@
-import type { Rect } from '../domain/geometry'
-import { isNoteColor, type Note } from '../domain/note'
+import { isNoteColor } from '../domain/note'
+import type { Note, Rect } from '../domain/types'
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null

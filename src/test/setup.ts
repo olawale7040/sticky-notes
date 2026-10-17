@@ -11,3 +11,14 @@ Element.prototype.hasPointerCapture = function (pointerId: number) {
 Element.prototype.releasePointerCapture = function (pointerId: number) {
   captured.get(this)?.delete(pointerId)
 }
+
+Object.defineProperties(HTMLElement.prototype, {
+  clientWidth: { configurable: true, get: () => 1024 },
+  clientHeight: { configurable: true, get: () => 768 },
+})
+
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}

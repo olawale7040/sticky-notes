@@ -1,5 +1,5 @@
 import { createContext, useContext, type Dispatch } from 'react'
-import type { NotesAction, NotesState } from '../domain/notesReducer'
+import type { NotesAction, NotesState } from '../domain/types'
 
 export const NotesStateContext = createContext<NotesState | null>(null)
 export const NotesDispatchContext = createContext<Dispatch<NotesAction> | null>(null)
