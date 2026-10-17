@@ -9,16 +9,17 @@ import {
 } from './geometry'
 
 const bounds = { width: 1000, height: 800 }
+const rect = { x: 10, y: 20, width: 100, height: 50 }
 
-describe('translateRect / resizeRect', () => {
-  const rect = { x: 10, y: 20, width: 100, height: 50 }
-
+describe('translateRect', () => {
   it('moves a rect without changing its size', () => {
-    expect(translateRect(rect, { x: 5, y: -5 })).toEqual({ x: 15, y: 15, width: 100, height: 50 })
+    expect(translateRect(rect, { x: 5, y: -5 })).toEqual({ ...rect, x: 15, y: 15 })
   })
+})
 
+describe('resizeRect', () => {
   it('resizes a rect without moving it', () => {
-    expect(resizeRect(rect, { x: 5, y: -5 })).toEqual({ x: 10, y: 20, width: 105, height: 45 })
+    expect(resizeRect(rect, { x: 5, y: -5 })).toEqual({ ...rect, width: 105, height: 45 })
   })
 })
 
@@ -33,26 +34,35 @@ describe('rectFromPoints', () => {
   })
 })
 
-describe('containsPoint', () => {
-  const rect = { x: 10, y: 10, width: 100, height: 50 }
+describe('rectCenter', () => {
+  it('returns the middle of a rect', () => {
+    expect(rectCenter(rect)).toEqual({ x: 60, y: 45 })
+  })
+})
 
+describe('containsPoint', () => {
   it('includes points on the edges', () => {
-    expect(containsPoint(rect, { x: 10, y: 60 })).toBe(true)
+    expect(containsPoint(rect, { x: rect.x, y: rect.y + rect.height })).toBe(true)
   })
 
   it('excludes points outside', () => {
-    expect(containsPoint(rect, { x: 111, y: 30 })).toBe(false)
+    expect(containsPoint(rect, { x: rect.x + rect.width + 1, y: 30 })).toBe(false)
   })
 })
 
 describe('clampPosition', () => {
   it('keeps the rect fully inside the bounds', () => {
-    expect(clampPosition({ x: -20, y: 790, width: 100, height: 100 }, bounds)).toEqual({
+    const size = { width: 100, height: 100 }
+    expect(clampPosition({ ...size, x: -20, y: 790 }, bounds)).toEqual({
+      ...size,
       x: 0,
-      y: 700,
-      width: 100,
-      height: 100,
+      y: bounds.height - size.height,
     })
+  })
+
+  it('pins a rect larger than the bounds to the top-left corner', () => {
+    const oversized = { x: 50, y: 50, width: 1200, height: 900 }
+    expect(clampPosition(oversized, bounds)).toEqual({ ...oversized, x: 0, y: 0 })
   })
 })
 
@@ -64,12 +74,14 @@ describe('clampSize', () => {
   })
 
   it('stops growth at the bounds edge', () => {
-    expect(clampSize({ x: 800, y: 0, width: 500, height: 100 }, min, bounds).width).toBe(200)
+    const x = 800
+    expect(clampSize({ x, y: 0, width: 500, height: 100 }, min, bounds).width).toBe(
+      bounds.width - x,
+    )
   })
-})
 
-describe('rectCenter', () => {
-  it('returns the middle of a rect', () => {
-    expect(rectCenter({ x: 10, y: 20, width: 100, height: 50 })).toEqual({ x: 60, y: 45 })
+  it('keeps the minimum size when there is less room than that before the edge', () => {
+    const nearEdge = { x: bounds.width - 50, y: bounds.height - 50, width: 500, height: 500 }
+    expect(clampSize(nearEdge, min, bounds)).toMatchObject(min)
   })
 })
